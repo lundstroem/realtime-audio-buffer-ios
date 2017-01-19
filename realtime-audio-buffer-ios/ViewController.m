@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import <AVFoundation/AVFoundation.h>
 #import "RTAudioBuffer.h"
 
 @interface ViewController ()
@@ -18,14 +19,26 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+
+    [self initNotifications];
     runAudio();
 }
 
+-(void)audio_session_route_changed:(NSNotification*)notification {
+    NSLog(@"notification received: %@", notification);
+}
 
+-(void)initNotifications {
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(audio_session_route_changed:)
+                                                 name:AVAudioSessionRouteChangeNotification
+                                               object:nil];
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 
 
 @end

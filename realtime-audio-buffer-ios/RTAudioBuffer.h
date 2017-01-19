@@ -11,9 +11,8 @@
 @interface RTAudioBuffer : NSObject
 
 void runAudio(void);
-int initAudioStreams(void);
-int startAudioUnit(void);
-int stopProcessingAudio(void);
+void startAudioUnit(void);
+void stopProcessingAudio(void);
 
 @end
 
