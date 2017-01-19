@@ -1,0 +1,335 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		035591AF1E30B67D00531A22 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 035591AE1E30B67D00531A22 /* main.m */; };
+		035591B21E30B67D00531A22 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 035591B11E30B67D00531A22 /* AppDelegate.m */; };
+		035591B51E30B67D00531A22 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 035591B41E30B67D00531A22 /* ViewController.m */; };
+		035591B81E30B67D00531A22 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 035591B61E30B67D00531A22 /* Main.storyboard */; };
+		035591BA1E30B67D00531A22 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 035591B91E30B67D00531A22 /* Assets.xcassets */; };
+		035591BD1E30B67D00531A22 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 035591BB1E30B67D00531A22 /* LaunchScreen.storyboard */; };
+		035591C61E30B6BF00531A22 /* RTAudioBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 035591C51E30B6BF00531A22 /* RTAudioBuffer.m */; };
+		035591C91E30B6FC00531A22 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 035591C81E30B6FC00531A22 /* AudioToolbox.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		035591AA1E30B67D00531A22 /* realtime-audio-buffer-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "realtime-audio-buffer-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		035591AE1E30B67D00531A22 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		035591B01E30B67D00531A22 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		035591B11E30B67D00531A22 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		035591B31E30B67D00531A22 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		035591B41E30B67D00531A22 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		035591B71E30B67D00531A22 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		035591B91E30B67D00531A22 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		035591BC1E30B67D00531A22 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		035591BE1E30B67D00531A22 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		035591C41E30B6BF00531A22 /* RTAudioBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTAudioBuffer.h; sourceTree = "<group>"; };
+		035591C51E30B6BF00531A22 /* RTAudioBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTAudioBuffer.m; sourceTree = "<group>"; };
+		035591C81E30B6FC00531A22 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		035591A71E30B67D00531A22 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				035591C91E30B6FC00531A22 /* AudioToolbox.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		035591A11E30B67D00531A22 = {
+			isa = PBXGroup;
+			children = (
+				035591AC1E30B67D00531A22 /* realtime-audio-buffer-ios */,
+				035591AB1E30B67D00531A22 /* Products */,
+				035591C71E30B6FC00531A22 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		035591AB1E30B67D00531A22 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				035591AA1E30B67D00531A22 /* realtime-audio-buffer-ios.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		035591AC1E30B67D00531A22 /* realtime-audio-buffer-ios */ = {
+			isa = PBXGroup;
+			children = (
+				035591C41E30B6BF00531A22 /* RTAudioBuffer.h */,
+				035591C51E30B6BF00531A22 /* RTAudioBuffer.m */,
+				035591B01E30B67D00531A22 /* AppDelegate.h */,
+				035591B11E30B67D00531A22 /* AppDelegate.m */,
+				035591B31E30B67D00531A22 /* ViewController.h */,
+				035591B41E30B67D00531A22 /* ViewController.m */,
+				035591B61E30B67D00531A22 /* Main.storyboard */,
+				035591B91E30B67D00531A22 /* Assets.xcassets */,
+				035591BB1E30B67D00531A22 /* LaunchScreen.storyboard */,
+				035591BE1E30B67D00531A22 /* Info.plist */,
+				035591AD1E30B67D00531A22 /* Supporting Files */,
+			);
+			path = "realtime-audio-buffer-ios";
+			sourceTree = "<group>";
+		};
+		035591AD1E30B67D00531A22 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				035591AE1E30B67D00531A22 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		035591C71E30B6FC00531A22 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				035591C81E30B6FC00531A22 /* AudioToolbox.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		035591A91E30B67D00531A22 /* realtime-audio-buffer-ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 035591C11E30B67D00531A22 /* Build configuration list for PBXNativeTarget "realtime-audio-buffer-ios" */;
+			buildPhases = (
+				035591A61E30B67D00531A22 /* Sources */,
+				035591A71E30B67D00531A22 /* Frameworks */,
+				035591A81E30B67D00531A22 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "realtime-audio-buffer-ios";
+			productName = "realtime-audio-buffer-ios";
+			productReference = 035591AA1E30B67D00531A22 /* realtime-audio-buffer-ios.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		035591A21E30B67D00531A22 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = "Harry Lundström";
+				TargetAttributes = {
+					035591A91E30B67D00531A22 = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = QM9YTQA8XQ;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 035591A51E30B67D00531A22 /* Build configuration list for PBXProject "realtime-audio-buffer-ios" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 035591A11E30B67D00531A22;
+			productRefGroup = 035591AB1E30B67D00531A22 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				035591A91E30B67D00531A22 /* realtime-audio-buffer-ios */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		035591A81E30B67D00531A22 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				035591BD1E30B67D00531A22 /* LaunchScreen.storyboard in Resources */,
+				035591BA1E30B67D00531A22 /* Assets.xcassets in Resources */,
+				035591B81E30B67D00531A22 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		035591A61E30B67D00531A22 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				035591C61E30B6BF00531A22 /* RTAudioBuffer.m in Sources */,
+				035591B51E30B67D00531A22 /* ViewController.m in Sources */,
+				035591B21E30B67D00531A22 /* AppDelegate.m in Sources */,
+				035591AF1E30B67D00531A22 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		035591B61E30B67D00531A22 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				035591B71E30B67D00531A22 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		035591BB1E30B67D00531A22 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				035591BC1E30B67D00531A22 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		035591BF1E30B67D00531A22 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		035591C01E30B67D00531A22 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		035591C21E30B67D00531A22 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = QM9YTQA8XQ;
+				INFOPLIST_FILE = "realtime-audio-buffer-ios/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.harrylundstrom.rtaudiobuffer.realtime-audio-buffer-ios";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		035591C31E30B67D00531A22 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = QM9YTQA8XQ;
+				INFOPLIST_FILE = "realtime-audio-buffer-ios/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.harrylundstrom.rtaudiobuffer.realtime-audio-buffer-ios";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		035591A51E30B67D00531A22 /* Build configuration list for PBXProject "realtime-audio-buffer-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				035591BF1E30B67D00531A22 /* Debug */,
+				035591C01E30B67D00531A22 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		035591C11E30B67D00531A22 /* Build configuration list for PBXNativeTarget "realtime-audio-buffer-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				035591C21E30B67D00531A22 /* Debug */,
+				035591C31E30B67D00531A22 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 035591A21E30B67D00531A22 /* Project object */;
+}
