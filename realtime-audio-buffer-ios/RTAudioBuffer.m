@@ -1,72 +1,83 @@
-//
-//  RTAudioBuffer.m
-//  ios-realtime-audio-buffer
-//
-//  Created by Harry Lundstrom on 18/01/17.
-//  Copyright © 2017 Harry Lundström. All rights reserved.
-//
-
 /*
- todo:
-    - handle routechange events
-    - review all properties to set
-    - clean up resources
-    - correct behavious with the rest of the iOS audio system,
-    - determine what needs to be done when suspending/resuming app (lifecycle)
+ 
+ This is free and unencumbered software released into the public domain.
+ 
+ Anyone is free to copy, modify, publish, use, compile, sell, or
+ distribute this software, either in source code form or as a compiled
+ binary, for any purpose, commercial or non-commercial, and by any
+ means.
+ 
+ In jurisdictions that recognize copyright laws, the author or authors
+ of this software dedicate any and all copyright interest in the
+ software to the public domain. We make this dedication for the benefit
+ of the public at large and to the detriment of our heirs and
+ successors. We intend this dedication to be an overt act of
+ relinquishment in perpetuity of all present and future rights to this
+ software under copyright law.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+ 
+ For more information, please refer to <http://unlicense.org>
+ 
+ ----------------------------------------------------------------
+ realtime-audio-buffer-ios v0.8
+ Author: Harry Lundström 2017-01-22
+ 
  */
 
 #import "RTAudioBuffer.h"
-#import <AudioUnit/AudioUnit.h>
-#import <AudioToolbox/AudioSession.h>
 #import <AVFoundation/AVFoundation.h>
 
 @implementation RTAudioBuffer
 static AudioUnit *audioUnit = NULL;
-static void initAudioSession(void);
-static void initAudioStreams(void);
-void runAudio(void) {
-    initAudioSession();
-    initAudioStreams();
-    startAudioUnit();
-}
+static bool debuglog = true;
 void printOSStatus(char *name, OSStatus status) {
     if(status != noErr) {
-        NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-        NSLog(@"%s:%@", name, error);
+        if(debuglog) {
+            NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+            NSLog(@"%s:%@", name, error);
+        }
     }
 }
-static void initAudioSession(void) {
+void rtAudioInitWithCallback(OSStatus(*renderCallback)(void *userData,
+                                                       AudioUnitRenderActionFlags *actionFlags,
+                                                       const AudioTimeStamp *audioTimeStamp,
+                                                       UInt32 busNumber,
+                                                       UInt32 numFrames,
+                                                       AudioBufferList *buffers),
+                                                       double preferredBufferDurationInSeconds) {
+    // init audio session
     BOOL success = YES;
     NSError *error;
     audioUnit = (AudioUnit*)malloc(sizeof(AudioUnit));
     success = [[AVAudioSession sharedInstance] setActive:YES error:nil];
     if(!success) {
-        NSLog(@"setActive %@", error);
+        if(debuglog) {
+            NSLog(@"setActive %@", error);
+        }
         return;
     }
     success = [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     if(!success) {
-        NSLog(@"AVAudioSessionCategoryPlayback %@", error);
+        if(debuglog) {
+            NSLog(@"AVAudioSessionCategoryPlayback %@", error);
+        }
         return;
     }
-    success = [[AVAudioSession sharedInstance] setPreferredIOBufferDuration:0.02 error:&error];
+    success = [[AVAudioSession sharedInstance] setPreferredIOBufferDuration:preferredBufferDurationInSeconds error:&error];
     if(!success) {
-        NSLog(@"setPreferredIOBufferDuration %@", error);
+        if(debuglog) {
+            NSLog(@"setPreferredIOBufferDuration %@", error);
+        }
         return;
     }
-   /* UInt32 overrideCategory = 1;
-    if(AudioSessionSetProperty(kAudioSessionProperty_OverrideCategoryDefaultToSpeaker,
-                               sizeof(UInt32), &overrideCategory) != noErr) {
-        return 1;
-    }*/
-    
-    // There are many properties you might want to provide callback functions for:
-    // kAudioSessionProperty_AudioRouteChange
-    // kAudioSessionProperty_OverrideCategoryEnableBluetoothInput
-    // etc.
-    
-}
-void initAudioStreams(void) {
+    // init audio streams
     OSStatus status = noErr;
     AudioComponentDescription componentDescription;
     componentDescription.componentType = kAudioUnitType_Output;
@@ -80,80 +91,51 @@ void initAudioStreams(void) {
         printOSStatus("AudioComponentInstanceNew", status);
         return;
     }
-    AURenderCallbackStruct callbackStruct;
-    callbackStruct.inputProc = renderCallback; // Render function
-    callbackStruct.inputProcRefCon = NULL;
-    status = AudioUnitSetProperty(*audioUnit, kAudioUnitProperty_SetRenderCallback,
-                            kAudioUnitScope_Input, 0, &callbackStruct,
-                                  sizeof(AURenderCallbackStruct));
-    if(status != noErr) {
-        printOSStatus("AudioUnitSetProperty kAudioUnitProperty_SetRenderCallback", status);
-        return;
-    }
+    // the stream will be set up as a 16bit signed integer interleaved stereo PCM.
     AudioStreamBasicDescription streamDescription;
-    // You might want to replace this with a different value, but keep in mind that the
-    // iPhone does not support all sample rates. 8kHz, 22kHz, and 44.1kHz should all work.
     streamDescription.mSampleRate = 44100;
-    // Yes, I know you probably want floating point samples, but the iPhone isn't going
-    // to give you floating point data. You'll need to make the conversion by hand from
-    // linear PCM <-> float.
     streamDescription.mFormatID = kAudioFormatLinearPCM;
-    // This part is important!
-    streamDescription.mFormatFlags = kAudioFormatFlagIsSignedInteger |
-    kAudioFormatFlagsNativeEndian |
-    kAudioFormatFlagIsPacked;
-    // Not sure if the iPhone supports recording >16-bit audio, but I doubt it.
-    streamDescription.mBitsPerChannel = 16;
-    // 1 sample per frame, will always be 2 as long as 16-bit samples are being used
-    streamDescription.mBytesPerFrame = 2;
-    // Record in mono. Use 2 for stereo, though I don't think the iPhone does true stereo recording
-    streamDescription.mChannelsPerFrame = 1;
-    streamDescription.mBytesPerPacket = streamDescription.mBytesPerFrame *
-    streamDescription.mChannelsPerFrame;
-    // Always should be set to 1
+    streamDescription.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked | kAudioFormatFlagsNativeEndian;
+    streamDescription.mChannelsPerFrame = 2;
+    streamDescription.mBytesPerPacket = sizeof(SInt16) * 2;
     streamDescription.mFramesPerPacket = 1;
-    // Always set to 0, just to be sure
+    streamDescription.mBytesPerFrame = sizeof(SInt16) * 2;
+    streamDescription.mBitsPerChannel = sizeof(SInt16) * 8;
     streamDescription.mReserved = 0;
-    // Set up input stream with above properties
+    
+    // input stream
+    // (it's a bit confusing, but apparently it's called input because the samples we write in the callback are considered an input)
     status = AudioUnitSetProperty(*audioUnit, kAudioUnitProperty_StreamFormat,
                                   kAudioUnitScope_Input, 0, &streamDescription, sizeof(streamDescription));
     if(status != noErr) {
         printOSStatus("AudioUnitSetProperty kAudioUnitProperty_StreamFormat kAudioUnitScope_Input", status);
         return;
     }
-    // Ditto for the output stream, which we will be sending the processed audio to
-    status = AudioUnitSetProperty(*audioUnit, kAudioUnitProperty_StreamFormat,
-                                  kAudioUnitScope_Output, 1, &streamDescription, sizeof(streamDescription));
+    AURenderCallbackStruct callbackStruct;
+    callbackStruct.inputProc = renderCallback; // render function
+    callbackStruct.inputProcRefCon = NULL;
+    status = AudioUnitSetProperty(*audioUnit, kAudioUnitProperty_SetRenderCallback,
+                                  kAudioUnitScope_Input, 0, &callbackStruct,
+                                  sizeof(AURenderCallbackStruct));
     if(status != noErr) {
-        printOSStatus("AudioUnitSetProperty kAudioUnitProperty_StreamFormat kAudioUnitScope_Output", status);
+        printOSStatus("AudioUnitSetProperty kAudioUnitProperty_SetRenderCallback", status);
         return;
     }
+    rtAudioStartAudioUnit();
 }
-void startAudioUnit(void) {
+void rtAudioStartAudioUnit(void) {
     OSStatus status = noErr;
     status = AudioUnitInitialize(*audioUnit);
     printOSStatus("AudioUnitInitialize", status);
     status = AudioOutputUnitStart(*audioUnit);
     printOSStatus("AudioOutputUnitStart", status);
 }
-void stopProcessingAudio(void) {
+void rtAudioStopProcessingAudio(void) {
     OSStatus status = noErr;
     status = AudioOutputUnitStop(*audioUnit);
     printOSStatus("AudioOutputUnitStop", status);
     status = AudioUnitUninitialize(*audioUnit);
     printOSStatus("AudioUnitUninitialize", status);
     *audioUnit = NULL;
-}
-OSStatus renderCallback(void *userData,
-                        AudioUnitRenderActionFlags *actionFlags,
-                        const AudioTimeStamp *audioTimeStamp,
-                        UInt32 busNumber,
-                        UInt32 numFrames,
-                        AudioBufferList *buffers) {
-    SInt16 *inputFrames = (SInt16*)(buffers->mBuffers->mData);
-    for(int i = 0; i < numFrames; i++) {
-        inputFrames[i] = (rand() % 32767) -16000;
-    }
-    return noErr;
 }
 @end
