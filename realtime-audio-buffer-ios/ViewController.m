@@ -85,7 +85,7 @@ OSStatus renderCallback(void *userData,
 }
 - (void)removeObservers {
     UIApplication *app = [UIApplication sharedApplication];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionRouteChangeNotification object:app];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillTerminateNotification object:app];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionRouteChangeNotification object:nil];
 }
 - (void)didReceiveMemoryWarning {

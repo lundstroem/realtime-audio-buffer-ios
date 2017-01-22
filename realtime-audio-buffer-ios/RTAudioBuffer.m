@@ -38,11 +38,9 @@
 static AudioUnit *audioUnit = NULL;
 static bool debuglog = true;
 void printOSStatus(char *name, OSStatus status) {
-    if(status != noErr) {
-        if(debuglog) {
-            NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-            NSLog(@"%s:%@", name, error);
-        }
+    if(debuglog) {
+        NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+        NSLog(@"%s:%@", name, error);
     }
 }
 void rtAudioInitWithCallback(OSStatus(*renderCallback)(void *userData,
@@ -126,16 +124,24 @@ void rtAudioInitWithCallback(OSStatus(*renderCallback)(void *userData,
 void rtAudioStartAudioUnit(void) {
     OSStatus status = noErr;
     status = AudioUnitInitialize(*audioUnit);
-    printOSStatus("AudioUnitInitialize", status);
+    if(status != noErr) {
+        printOSStatus("AudioUnitInitialize", status);
+    }
     status = AudioOutputUnitStart(*audioUnit);
-    printOSStatus("AudioOutputUnitStart", status);
+    if(status != noErr) {
+        printOSStatus("AudioOutputUnitStart", status);
+    }
 }
 void rtAudioStopProcessingAudio(void) {
     OSStatus status = noErr;
     status = AudioOutputUnitStop(*audioUnit);
-    printOSStatus("AudioOutputUnitStop", status);
+    if(status != noErr) {
+        printOSStatus("AudioOutputUnitStop", status);
+    }
     status = AudioUnitUninitialize(*audioUnit);
-    printOSStatus("AudioUnitUninitialize", status);
+    if(status != noErr) {
+        printOSStatus("AudioUnitUninitialize", status);
+    }
     *audioUnit = NULL;
 }
 @end
