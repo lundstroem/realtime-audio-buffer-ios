@@ -50,18 +50,23 @@ void rtAudioInitWithCallback(OSStatus(*renderCallback)(void *userData,
                                                        UInt32 numFrames,
                                                        AudioBufferList *buffers),
                                                        double preferredBufferDurationInSeconds) {
+    // if resuming after interruption
+    if(audioUnit != NULL) {
+        rtAudioStopAudioUnit();
+    }
+    
     // init audio session
     BOOL success = YES;
     NSError *error;
     audioUnit = (AudioUnit*)malloc(sizeof(AudioUnit));
-    success = [[AVAudioSession sharedInstance] setActive:YES error:nil];
+    success = [[AVAudioSession sharedInstance] setActive:YES error:&error];
     if(!success) {
         if(debuglog) {
             NSLog(@"setActive %@", error);
         }
         return;
     }
-    success = [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+    success = [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
     if(!success) {
         if(debuglog) {
             NSLog(@"AVAudioSessionCategoryPlayback %@", error);
@@ -132,7 +137,7 @@ void rtAudioStartAudioUnit(void) {
         printOSStatus("AudioOutputUnitStart", status);
     }
 }
-void rtAudioStopProcessingAudio(void) {
+void rtAudioStopAudioUnit(void) {
     OSStatus status = noErr;
     status = AudioOutputUnitStop(*audioUnit);
     if(status != noErr) {

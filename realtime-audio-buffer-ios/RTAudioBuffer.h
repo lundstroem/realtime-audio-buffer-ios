@@ -43,7 +43,7 @@ void rtAudioInitWithCallback(OSStatus(*renderCallback)(void *userData,
                                                            UInt32 numFrames,
                                                            AudioBufferList *buffers), double preferredBufferDurationInSeconds);
 void rtAudioStartAudioUnit(void);
-void rtAudioStopProcessingAudio(void);
+void rtAudioStopAudioUnit(void);
 @end
 
 
