@@ -25,10 +25,6 @@
  
  For more information, please refer to <http://unlicense.org>
  
- ----------------------------------------------------------------
- realtime-audio-buffer-ios v0.8
- Author: Harry Lundström 2017-01-22
- 
  */
 
 #import "AppDelegate.h"

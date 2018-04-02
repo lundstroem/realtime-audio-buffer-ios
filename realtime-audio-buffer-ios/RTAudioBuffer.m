@@ -25,10 +25,6 @@
  
  For more information, please refer to <http://unlicense.org>
  
- ----------------------------------------------------------------
- realtime-audio-buffer-ios v0.8
- Author: Harry Lundström 2017-01-22
- 
  */
 
 #import "RTAudioBuffer.h"
@@ -37,12 +33,14 @@
 @implementation RTAudioBuffer
 static AudioUnit *audioUnit = NULL;
 static bool debuglog = true;
+
 void printOSStatus(char *name, OSStatus status) {
     if(debuglog) {
         NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
         NSLog(@"%s:%@", name, error);
     }
 }
+
 void rtAudioInitWithCallback(OSStatus(*renderCallback)(void *userData,
                                                        AudioUnitRenderActionFlags *actionFlags,
                                                        const AudioTimeStamp *audioTimeStamp,
@@ -126,6 +124,7 @@ void rtAudioInitWithCallback(OSStatus(*renderCallback)(void *userData,
     }
     rtAudioStartAudioUnit();
 }
+
 void rtAudioStartAudioUnit(void) {
     OSStatus status = noErr;
     status = AudioUnitInitialize(*audioUnit);
@@ -137,6 +136,7 @@ void rtAudioStartAudioUnit(void) {
         printOSStatus("AudioOutputUnitStart", status);
     }
 }
+
 void rtAudioStopAudioUnit(void) {
     OSStatus status = noErr;
     status = AudioOutputUnitStop(*audioUnit);
