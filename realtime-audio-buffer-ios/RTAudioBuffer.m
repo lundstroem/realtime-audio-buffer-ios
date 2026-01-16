@@ -1,12 +1,12 @@
 /*
- 
+
  This is free and unencumbered software released into the public domain.
- 
+
  Anyone is free to copy, modify, publish, use, compile, sell, or
  distribute this software, either in source code form or as a compiled
  binary, for any purpose, commercial or non-commercial, and by any
  means.
- 
+
  In jurisdictions that recognize copyright laws, the author or authors
  of this software dedicate any and all copyright interest in the
  software to the public domain. We make this dedication for the benefit
@@ -14,7 +14,7 @@
  successors. We intend this dedication to be an overt act of
  relinquishment in perpetuity of all present and future rights to this
  software under copyright law.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -22,22 +22,30 @@
  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  OTHER DEALINGS IN THE SOFTWARE.
- 
+
  For more information, please refer to <http://unlicense.org>
- 
+
  */
 
 #import "RTAudioBuffer.h"
 #import <AVFoundation/AVFoundation.h>
+#import <TargetConditionals.h>
 
 @implementation RTAudioBuffer
+
 static AudioUnit *audioUnit = NULL;
 static bool debuglog = true;
+static NSMutableArray *errorLogArray = NULL;
 
-void printOSStatus(char *name, OSStatus status) {
+static void printOSStatus(char *name, OSStatus status) {
+
     if(debuglog) {
         NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-        NSLog(@"%s:%@", name, error);
+
+        NSString *errorString = [NSString stringWithFormat:@"%s:%@", name, error];
+        NSLog(@"%@", errorString);
+
+        [errorLogArray addObject:errorString];
     }
 }
 
@@ -48,15 +56,22 @@ void rtAudioInitWithCallback(OSStatus(*renderCallback)(void *userData,
                                                        UInt32 numFrames,
                                                        AudioBufferList *buffers),
                                                        double preferredBufferDurationInSeconds) {
-    // if resuming after interruption
+
+    if (!errorLogArray) {
+        errorLogArray = [[NSMutableArray alloc] init];
+    }
+
+    // If resuming after interruption
     if(audioUnit != NULL) {
         rtAudioStopAudioUnit();
     }
-    
-    // init audio session
+
+    // Init audio session
+    audioUnit = (AudioUnit*)malloc(sizeof(AudioUnit));
+
+#if TARGET_OS_IPHONE || TARGET_OS_TV
     BOOL success = YES;
     NSError *error;
-    audioUnit = (AudioUnit*)malloc(sizeof(AudioUnit));
     success = [[AVAudioSession sharedInstance] setActive:YES error:&error];
     if(!success) {
         if(debuglog) {
@@ -78,21 +93,32 @@ void rtAudioInitWithCallback(OSStatus(*renderCallback)(void *userData,
         }
         return;
     }
-    // init audio streams
+#endif
+    // Init audio stream
     OSStatus status = noErr;
-    AudioComponentDescription componentDescription;
+    AudioComponentDescription componentDescription = {0};
     componentDescription.componentType = kAudioUnitType_Output;
+#if TARGET_OS_IPHONE || TARGET_OS_TV
     componentDescription.componentSubType = kAudioUnitSubType_RemoteIO;
+#elif TARGET_OS_OSX
+    componentDescription.componentSubType = kAudioUnitSubType_HALOutput;
+#endif
     componentDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
     componentDescription.componentFlags = 0;
     componentDescription.componentFlagsMask = 0;
+
     AudioComponent component = AudioComponentFindNext(NULL, &componentDescription);
+    if(!component) {
+        [errorLogArray addObject:@"AudioComponentFindNext returned nil"];
+        return;
+    }
     status = AudioComponentInstanceNew(component, audioUnit);
     if(status != noErr) {
         printOSStatus("AudioComponentInstanceNew", status);
         return;
     }
-    // the stream will be set up as a 16bit signed integer interleaved stereo PCM.
+
+    // The stream will be set up as a 16bit signed integer interleaved stereo PCM.
     AudioStreamBasicDescription streamDescription;
     streamDescription.mSampleRate = 44100;
     streamDescription.mFormatID = kAudioFormatLinearPCM;
@@ -103,27 +129,88 @@ void rtAudioInitWithCallback(OSStatus(*renderCallback)(void *userData,
     streamDescription.mBytesPerFrame = sizeof(SInt16) * 2;
     streamDescription.mBitsPerChannel = sizeof(SInt16) * 8;
     streamDescription.mReserved = 0;
-    
-    // input stream
-    // (it's a bit confusing, but apparently it's called input because the samples we write in the callback are considered an input)
-    status = AudioUnitSetProperty(*audioUnit, kAudioUnitProperty_StreamFormat,
-                                  kAudioUnitScope_Input, 0, &streamDescription, sizeof(streamDescription));
+
+#if TARGET_OS_OSX
+    // Disable input after setting HALOutput
+    UInt32 enableIO = 0;
+    AudioUnitSetProperty(
+        *audioUnit,
+        kAudioOutputUnitProperty_EnableIO,
+        kAudioUnitScope_Input,
+        1,
+        &enableIO,
+        sizeof(enableIO)
+    );
+
+    // Set default device for HALOutput
+    AudioDeviceID deviceID = rtAudioGetDefaultOutputDevice();
+    AudioUnitSetProperty(
+        *audioUnit,
+        kAudioOutputUnitProperty_CurrentDevice,
+        kAudioUnitScope_Global,
+        0,
+        &deviceID,
+        sizeof(deviceID)
+    );
+#endif
+
+    // Setup input stream to render callback
+    status = AudioUnitSetProperty(*audioUnit,
+                                  kAudioUnitProperty_StreamFormat,
+                                  kAudioUnitScope_Input,
+                                  0,
+                                  &streamDescription,
+                                  sizeof(streamDescription));
     if(status != noErr) {
         printOSStatus("AudioUnitSetProperty kAudioUnitProperty_StreamFormat kAudioUnitScope_Input", status);
         return;
     }
+
     AURenderCallbackStruct callbackStruct;
     callbackStruct.inputProc = renderCallback; // render function
     callbackStruct.inputProcRefCon = NULL;
-    status = AudioUnitSetProperty(*audioUnit, kAudioUnitProperty_SetRenderCallback,
-                                  kAudioUnitScope_Input, 0, &callbackStruct,
+    status = AudioUnitSetProperty(*audioUnit,
+                                  kAudioUnitProperty_SetRenderCallback,
+                                  kAudioUnitScope_Input,
+                                  0,
+                                  &callbackStruct,
                                   sizeof(AURenderCallbackStruct));
     if(status != noErr) {
         printOSStatus("AudioUnitSetProperty kAudioUnitProperty_SetRenderCallback", status);
         return;
     }
+
     rtAudioStartAudioUnit();
 }
+
+#if TARGET_OS_OSX
+AudioDeviceID rtAudioGetDefaultOutputDevice(void) {
+    AudioDeviceID deviceID = kAudioObjectUnknown;
+    UInt32 size = sizeof(deviceID);
+
+    AudioObjectPropertyAddress address = {
+        kAudioHardwarePropertyDefaultOutputDevice,
+        kAudioObjectPropertyScopeGlobal,
+        kAudioObjectPropertyElementMain
+    };
+
+    OSStatus status = AudioObjectGetPropertyData(
+        kAudioObjectSystemObject,
+        &address,
+        0,
+        NULL,
+        &size,
+        &deviceID
+    );
+
+    if (status != noErr) {
+        printOSStatus("rtAudioGetDefaultOutputDevice: Failed to get default output device", status);
+        return kAudioObjectUnknown;
+    }
+
+    return deviceID;
+}
+#endif
 
 void rtAudioStartAudioUnit(void) {
     OSStatus status = noErr;
@@ -149,4 +236,9 @@ void rtAudioStopAudioUnit(void) {
     }
     *audioUnit = NULL;
 }
+
+NSMutableArray *rtAudioGetLogs(void) {
+    return errorLogArray;
+}
+
 @end

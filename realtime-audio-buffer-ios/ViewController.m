@@ -37,30 +37,32 @@
 
 @implementation ViewController
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 OSStatus renderCallback(void *userData,
                         AudioUnitRenderActionFlags *actionFlags,
                         const AudioTimeStamp *audioTimeStamp,
                         UInt32 busNumber,
                         UInt32 numFrames,
                         AudioBufferList *buffers) {
-    SInt16 *inputFrames = (SInt16*)(buffers->mBuffers->mData);
+
+    SInt16 *inputFrames = (SInt16 *)(buffers->mBuffers->mData);
     int totalFrames = numFrames*2;
-    // zero the buffer
+
+    // Zero the buffer
     for(int i = 0; i < totalFrames; i++) {
         inputFrames[i] = 0;
     }
+
     // When generating samples from a data structure such as a synthesizer that is controlled from
-    // another thread, use a mutex to prevent the two threads from manupulating the data at the same time.
-    // The code that manipulates the structure in the UI thread needs to be enclosed with the same mutex.
-    // Try to keep the work inside the locks to a minimum to prevent stalling.
-    pthread_mutex_lock(&mutex);
-    // write samples
+    // the main thread, preferrably use non-blocking atomic messages to communicate between the threads
+    // to synchronize the mutable data if needed.
+    // The audio thread should under no circumstances be blocked.
+
+    // Write samples
     for(int i = 0; i < totalFrames; i+=2) {
-        inputFrames[i] = 0; // write silence to the left channel
-        inputFrames[i+1] = (rand() % INT16_MAX) -INT16_MAX/2; // write noise to the right channel
+        inputFrames[i] = 0; // Write silence to the left channel
+        inputFrames[i+1] = (rand() % INT16_MAX) -INT16_MAX/2; // Write noise to the right channel
     }
-    pthread_mutex_unlock(&mutex);
+
     return noErr;
 }
 
@@ -71,7 +73,7 @@ OSStatus renderCallback(void *userData,
 }
 
 - (void)initAudio {
-    // set the renderCallback and a preferred bufferduration (latency) of 0.02 seconds
+    // Set the renderCallback and a preferred bufferduration (latency) of 0.02 seconds (only affects iOS)
     rtAudioInitWithCallback(renderCallback, 0.02);
 }
 
@@ -97,7 +99,7 @@ OSStatus renderCallback(void *userData,
             NSLog(@"AVAudioSessionInterruptionTypeEnded");
             if (interruptionOption.unsignedIntegerValue == AVAudioSessionInterruptionOptionShouldResume) {
                 NSLog(@"AVAudioSessionInterruptionOptionShouldResume");
-                // resume audio by reconfiguring, perhaps it could be done without reconfiguring everything from ground up.
+                // Resume audio by reconfiguring.
                 [self initAudio];
             }
         } break;
@@ -108,9 +110,7 @@ OSStatus renderCallback(void *userData,
 
 - (void)handleMediaServicesReset {
     NSLog(@"handleMediaServicesReset");
-    /* - No userInfo dictionary for this notification
-       - Audio streaming objects are invalidated (zombies)
-       - Handle this notification by fully reconfiguring audio */
+    // Handle this notification by fully reconfiguring audio
     [self initAudio];
 }
 
